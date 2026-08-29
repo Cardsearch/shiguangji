@@ -12,11 +12,11 @@ describe('authRules', () => {
     expect(validatePassword('ab12')).toBe('密码至少 8 位')
     expect(validatePassword('abcdefgh')).toBe('密码需同时包含字母和数字')
     expect(validatePassword('12345678')).toBe('密码需同时包含字母和数字')
-    expect(validatePassword('test1234')).toBeNull()
+    expect(validatePassword('Sample123')).toBeNull()
   })
 
   it('确认密码一致', () => {
-    expect(validateConfirm('test1234', 'test1234')).toBeNull()
-    expect(validateConfirm('test1234', 'test1235')).toBe('两次输入的密码不一致')
+    expect(validateConfirm('Sample123', 'Sample123')).toBeNull()
+    expect(validateConfirm('Sample123', 'Sample124')).toBe('两次输入的密码不一致')
   })
 })
