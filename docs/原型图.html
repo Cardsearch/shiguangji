@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「食光记」原型图 · 每日食物记录</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* ============ 设计令牌 ============ */
+:root{
+  --paper:#FFF8EE;        /* 纸面米白 */
+  --paper-2:#FFFDF7;      /* 卡片白 */
+  --ink:#2B2520;          /* 墨炭 */
+  --ink-soft:#7A6C5C;     /* 弱化文字 */
+  --hair:#EADCC6;         /* 细线 */
+  --tomato:#E8502F;       /* 番茄红 */
+  --tomato-tint:#FAD9CE;
+  --veg:#3E8E4E;          /* 蔬菜绿 */
+  --veg-tint:#DCEAD5;
+  --yolk:#F4B63F;         /* 蛋黄 */
+  --yolk-tint:#FBEBC4;
+  --cocoa:#31261B;        /* 可可深棕 */
+  --cocoa-tint:#E9DFD3;
+  --disp:'ZCOOL KuaiLe','Noto Sans SC',sans-serif;
+  --body:'Noto Sans SC',sans-serif;
+  --mono:'DM Mono','Noto Sans SC',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input,select,textarea{font-family:inherit;font-size:14px;color:var(--ink);outline:none}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--body);color:var(--ink);
+  background:#241A11;
+  background-image:
+    radial-gradient(720px 420px at 12% -6%, rgba(232,80,47,.14), transparent 62%),
+    radial-gradient(640px 420px at 92% 8%, rgba(62,142,78,.12), transparent 60%),
+    radial-gradient(900px 700px at 50% 110%, rgba(244,182,63,.08), transparent 60%);
+  min-height:100vh;
+}
+.mono{font-family:var(--mono)}
+
+/* ============ 画布头部 ============ */
+.cv-head{max-width:1520px;margin:0 auto;padding:56px 40px 8px;color:#F5EBDC}
+.cv-kicker{font-size:12px;letter-spacing:.22em;color:#F4B63F;margin-bottom:14px}
+.cv-head h1{font-family:var(--disp);font-size:44px;font-weight:400;letter-spacing:.02em;line-height:1.15}
+.cv-head h1 em{font-style:normal;color:var(--tomato);text-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.cv-sub{margin-top:12px;font-size:15px;color:#C9B9A2;max-width:720px;line-height:1.7}
+.cv-sub b{color:#F5EBDC;font-weight:500}
+.tokens{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;align-items:center}
+.tk{display:flex;align-items:center;gap:8px;border:1px solid rgba(245,235,220,.22);border-radius:999px;padding:6px 14px 6px 8px;font-size:12.5px;color:#EDE1CF}
+.tk i.sw{width:16px;height:16px;border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.tk.type{padding:6px 14px;font-family:var(--mono);font-size:12px}
+.tk.type b{font-family:var(--disp);font-weight:400;font-size:14px;margin-right:6px;color:#F4B63F}
+
+/* ============ 画布舞台 ============ */
+.stage{max-width:1520px;margin:0 auto;padding:44px 40px 90px;display:flex;flex-wrap:wrap;gap:52px 46px;justify-content:center;align-items:flex-start}
+.shot{display:flex;flex-direction:column;gap:0}
+.shot-tag{display:flex;align-items:baseline;gap:10px;color:#F5EBDC;margin-bottom:14px}
+.shot-tag .no{font-family:var(--mono);font-size:13px;color:var(--tomato);letter-spacing:.1em}
+.shot-tag b{font-size:16px;font-weight:700;letter-spacing:.02em}
+.shot-tag span{font-size:12px;color:#B9A88F}
+.shot-row{display:flex;gap:22px;align-items:flex-start}
+.notes{width:218px;display:flex;flex-direction:column;gap:9px;padding-top:6px}
+.notes .n{position:relative;padding-left:14px;font-size:12.5px;line-height:1.65;color:#CDBDAA}
+.notes .n::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;background:var(--tomato);border-radius:1px;transform:rotate(45deg)}
+.notes .n b{color:#F5EBDC;font-weight:500}
+
+/* ============ 手机外框 ============ */
+.phone{width:410px;padding:10px;background:#120C06;border-radius:56px;box-shadow:0 34px 70px rgba(0,0,0,.5),inset 0 0 0 2px rgba(245,235,220,.08);flex:none}
+.p-view{position:relative;width:390px;height:800px;border-radius:46px;overflow:hidden;background:var(--paper)}
+.statusbar{position:absolute;top:0;left:0;right:0;z-index:6;display:flex;justify-content:space-between;align-items:center;padding:14px 26px 0;pointer-events:none}
+.statusbar .sb-time{font-family:var(--mono);font-size:12.5px;font-weight:500}
+.statusbar .sb-ico{display:flex;gap:6px;font-size:11px;color:var(--ink)}
+
+/* 屏幕 */
+.scr{display:none;position:absolute;inset:0;overflow-y:auto;background:var(--paper);padding:52px 20px 108px;scrollbar-width:thin;scrollbar-color:var(--hair) transparent}
+.scr::-webkit-scrollbar{width:4px}
+.scr::-webkit-scrollbar-thumb{background:var(--hair);border-radius:4px}
+.scr.on{display:block}
+.scr.bare{padding-bottom:28px}
+
+/* ============ 通用组件 ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14.5px;border-radius:12px;padding:12px 18px;border:2px solid var(--ink);transition:transform .12s ease,box-shadow .12s ease}
+.btn.primary{background:var(--tomato);color:#FFF6EC;box-shadow:3px 3px 0 var(--ink)}
+.btn.primary:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn.primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:var(--paper-2);color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.btn.ghost:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn.sm{padding:8px 13px;font-size:13px;border-radius:10px;box-shadow:2px 2px 0 var(--ink)}
+.btn.block{width:100%}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--ink);background:var(--paper-2);display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.eyebrow{font-size:11.5px;letter-spacing:.18em;color:var(--ink-soft);font-family:var(--mono)}
+.greet{font-family:var(--disp);font-weight:400;font-size:27px;line-height:1.2;margin-top:4px}
+.greet.sm{font-size:21px}
+.app-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;color:var(--ink)}
+.field label small{font-weight:400;color:var(--ink-soft);margin-left:6px}
+.inp{display:flex;align-items:center;gap:9px;background:var(--paper-2);border:1.5px solid var(--ink);border-radius:11px;padding:10px 12px}
+.inp i{font-size:13px;color:var(--ink-soft)}
+.inp input{border:none;background:transparent;width:100%}
+.inp input::placeholder{color:#B7A897}
+.fine{font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:14px}
+.fine a{color:var(--tomato);text-decoration:none}
+
+/* ============ ① 登录 / 注册 ============ */
+.auth-wrap{padding-top:64px}
+.brand{text-align:center;margin-bottom:36px}
+.brand-mark{width:66px;height:66px;margin:0 auto 14px;border-radius:20px;background:var(--tomato);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-size:26px;color:#FFF6EC;transform:rotate(-4deg)}
+.brand-name{font-family:var(--disp);font-weight:400;font-size:38px;letter-spacing:.06em}
+.brand-slogan{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--ink-soft);margin-top:6px}
+.seg{display:flex;border:2px solid var(--ink);border-radius:12px;overflow:hidden;margin-bottom:20px;background:var(--paper-2)}
+.seg .seg-btn{flex:1;padding:10px 0;font-weight:700;font-size:14px;color:var(--ink-soft)}
+.seg .seg-btn.on{background:var(--ink);color:var(--paper)}
+.reg-hint{display:flex;gap:8px;align-items:flex-start;border:1.5px dashed var(--ink-soft);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6}
+.reg-hint i{margin-top:2px;color:var(--veg)}
+
+/* ============ ② 今日主页 ============ */
+.streak{display:inline-flex;align-items:center;gap:6px;background:var(--yolk-tint);border:1.5px solid var(--ink);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;box-shadow:2px 2px 0 var(--ink)}
+.streak i{color:var(--tomato)}
+.ticket{background:var(--paper-2);border:2px solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink);padding:16px 18px 14px;transform:rotate(-.6deg);position:relative;margin-bottom:20px}
+.ticket::after{content:"";position:absolute;left:0;right:0;bottom:8px;border-bottom:2px dashed var(--hair);pointer-events:none}
+.tk-top{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.14em;color:var(--ink-soft);padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.tk-main{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+.tk-num b{font-family:var(--mono);font-size:52px;font-weight:500;line-height:1}
+.tk-num span{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-left:8px}
+.donut{width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--tomato) 0 55%,var(--hair) 55% 100%);display:flex;align-items:center;justify-content:center;position:relative}
+.donut::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--paper-2);border:1.5px solid var(--hair)}
+.donut-in{position:relative;text-align:center;line-height:1.25}
+.donut-in b{font-family:var(--mono);font-size:17px;display:block}
+.donut-in span{font-size:10px;color:var(--ink-soft)}
+.tk-bars{border-top:2px dashed var(--hair);padding-top:10px;display:flex;flex-direction:column;gap:7px}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.bar-row span{width:44px;color:var(--ink-soft)}
+.bar{flex:1;height:9px;background:var(--paper);border:1.5px solid var(--ink);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.bar-row:nth-child(1) i{background:var(--tomato)}
+.bar-row:nth-child(2) i{background:var(--yolk)}
+.bar-row:nth-child(3) i{background:var(--veg)}
+.bar-row b{font-family:var(--mono);font-size:12px;width:38px;text-align:right}
+.quick{display:flex;gap:10px;margin-bottom:24px}
+.qk{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--paper-2);border:1.5px solid var(--ink);border-radius:13px;padding:11px 0 9px;font-size:12.5px;font-weight:700;box-shadow:2.5px 2.5px 0 var(--ink);transition:transform .12s}
+.qk:hover{transform:translate(-1px,-1px)}
+.qk i{font-size:17px}
+.qk.t1 i{color:var(--tomato)} .qk.t2 i{color:#C98A1B} .qk.t3 i{color:var(--veg)}
+.meal{margin-bottom:18px}
+.meal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.meal-head h3{display:flex;align-items:center;gap:8px;font-size:15px}
+.meal-head h3 .dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ink);display:inline-block}
+.dot.m-bf{background:var(--yolk)} .dot.m-lu{background:var(--tomato)} .dot.m-di{background:var(--veg)} .dot.m-sn{background:var(--cocoa)}
+.meal-head .sum{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+.rc{display:flex;align-items:center;gap:12px;background:var(--paper-2);border:1.5px solid var(--ink);border-radius:13px;padding:10px 13px;margin-bottom:8px;box-shadow:2px 2px 0 rgba(43,37,32,.85)}
+.rc-mono{width:36px;height:36px;flex:none;border-radius:50%;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:17px}
+.rc-mono.m-bf{background:var(--yolk-tint)} .rc-mono.m-lu{background:var(--tomato-tint)} .rc-mono.m-di{background:var(--veg-tint)} .rc-mono.m-sn{background:var(--cocoa-tint)}
+.rc-body{flex:1;min-width:0}
+.rc-body b{display:block;font-size:14px}
+.rc-meta{font-size:11.5px;color:var(--ink-soft)}
+.rc-right{text-align:right}
+.rc-right>b{font-family:var(--mono);font-size:15px;font-weight:500;display:block}
+.rc-right>b i{font-style:normal;font-size:10px;color:var(--ink-soft);margin-left:2px}
+.rc-act{display:flex;gap:10px;justify-content:flex-end;font-size:12px;color:var(--ink-soft);opacity:0;transition:opacity .15s;margin-top:2px}
+.rc:hover .rc-act{opacity:1}
+.rc-act i:hover{color:var(--tomato)}
+.rc-empty{border:1.8px dashed var(--ink-soft);border-radius:13px;padding:16px;text-align:center;background:transparent}
+.rc-empty p{font-size:13px;color:var(--ink-soft);margin-bottom:10px}
+
+/* ============ Tab 栏 + FAB ============ */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:8;height:66px;background:var(--paper-2);border-top:2px solid var(--ink);display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;padding:0 8px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ink-soft);padding:6px 0}
+.tab i{font-size:17px}
+.tab.on{color:var(--ink);font-weight:700}
+.tab.on i{color:var(--tomato)}
+.tab.on::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--tomato)}
+.fab{position:absolute;z-index:9;left:50%;bottom:22px;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;background:var(--tomato);color:#FFF6EC;border:2px solid var(--ink);box-shadow:3px 4px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .12s}
+.fab:hover{transform:translateX(-50%) translateY(-2px)}
+.tab-gap{width:56px}
+.no-tab .tabbar,.no-tab .fab{display:none}
+
+/* ============ ③ 记一餐 ============ */
+.sheet-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sheet-head h3{font-family:var(--disp);font-weight:400;font-size:22px;flex:1}
+.sheet-head .date-chip{font-family:var(--mono);font-size:11.5px;border:1.5px solid var(--ink);border-radius:99px;padding:4px 10px;background:var(--paper-2)}
+.quick-chips{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 16px}
+.qc{font-size:12px;border:1.5px solid var(--ink);border-radius:999px;padding:5px 11px;background:var(--yolk-tint);box-shadow:1.5px 1.5px 0 var(--ink)}
+.qc:active{transform:translate(1px,1px);box-shadow:none}
+.seg4{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--ink);border-radius:11px;overflow:hidden;background:var(--paper-2)}
+.seg4 button{padding:9px 0;font-size:13px;font-weight:500;color:var(--ink-soft);border-left:1.5px solid var(--ink)}
+.seg4 button:first-child{border-left:none}
+.seg4 button.on{background:var(--tomato);color:#FFF6EC;font-weight:700}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--ink);border-radius:11px;background:var(--paper-2);overflow:hidden}
+.stepper button{width:38px;height:40px;font-size:12px}
+.stepper b{flex:1;text-align:center;font-family:var(--mono);font-size:15px;border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);line-height:40px}
+.inp.sel{padding:0}
+.inp.sel select{width:100%;border:none;background:transparent;padding:11px 12px;appearance:none}
+.row-kcal{display:flex;gap:10px;align-items:stretch}
+.row-kcal .inp{flex:1}
+.row-kcal .btn{flex:none}
+
+/* ============ ④ 来一餐 ============ */
+.fchips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.fchip{font-size:12.5px;font-weight:500;border:1.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:var(--paper-2);color:var(--ink-soft)}
+.fchip.on{background:var(--ink);color:var(--paper);font-weight:700;box-shadow:2px 2px 0 rgba(43,37,32,.35)}
+.draw{min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.draw-idle{text-align:center}
+.draw-btn{width:108px;height:108px;border-radius:50%;background:var(--tomato);color:#FFF6EC;border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);font-size:38px;transition:transform .15s;animation:wiggle 3.2s ease-in-out infinite}
+.draw-btn:hover{transform:scale(1.06) rotate(-6deg)}
+@keyframes wiggle{0%,100%{transform:rotate(0)}4%{transform:rotate(-5deg)}8%{transform:rotate(5deg)}12%{transform:rotate(0)}}
+.draw-idle p{margin-top:16px;font-size:14px;color:var(--ink-soft)}
+.draw-idle p b{color:var(--ink)}
+.draw-card{width:280px;background:var(--paper-2);border:2px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;animation:flipin .4s ease}
+@keyframes flipin{0%{transform:rotateY(90deg) scale(.92);opacity:0}100%{transform:rotateY(0) scale(1);opacity:1}}
+.dc-cover{height:150px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--ink);position:relative;overflow:hidden}
+.dc-cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(43,37,32,.07) 0 10px,transparent 10px 24px)}
+.dc-mono{width:86px;height:86px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:40px;position:relative;box-shadow:3px 3px 0 var(--ink)}
+.c-tomato{background:var(--tomato-tint)} .c-veg{background:var(--veg-tint)} .c-yolk{background:var(--yolk-tint)} .c-cocoa{background:var(--cocoa-tint)}
+.dc-body{padding:15px 17px 17px}
+.dc-name{font-size:20px;display:block}
+.dc-meta{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+.dc-tags{display:flex;gap:7px;margin-top:10px}
+.dc-tags span{font-size:11px;font-weight:700;border:1.5px solid var(--ink);border-radius:999px;padding:3px 9px;background:var(--yolk-tint)}
+.dc-tags span:nth-child(2){background:var(--veg-tint)}
+.dc-acts{display:flex;gap:9px;margin-top:15px}
+.dc-acts .btn{flex:1;padding:9px 6px;font-size:13px}
+.foot-note{text-align:center;font-size:11px;color:var(--ink-soft);letter-spacing:.06em}
+
+/* ============ ⑤ 问 AI ============ */
+.scr.on.col{display:flex;flex-direction:column}
+.scr.col{padding-bottom:0}
+.ai-head{align-items:center;gap:12px;flex:none}
+.ai-ava{width:44px;height:44px;border-radius:14px;background:var(--cocoa);color:#F5EBDC;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:2.5px 2.5px 0 var(--ink)}
+.chat{display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;overflow-y:auto;padding:2px 2px 10px 0;scrollbar-width:thin;scrollbar-color:var(--hair) transparent}
+.chat::-webkit-scrollbar{width:4px}
+.chat::-webkit-scrollbar-thumb{background:var(--hair);border-radius:4px}
+.msg{display:flex;gap:9px;max-width:92%}
+.msg.me{align-self:flex-end}
+.msg-ava{width:30px;height:30px;flex:none;border-radius:10px;background:var(--cocoa);color:#F5EBDC;display:flex;align-items:center;justify-content:center;font-size:12px;border:1.5px solid var(--ink)}
+.bubble{background:var(--paper-2);border:1.5px solid var(--ink);border-radius:4px 14px 14px 14px;padding:11px 13px;font-size:13.5px;line-height:1.7;box-shadow:2px 2px 0 rgba(43,37,32,.8)}
+.msg.me .bubble{background:var(--tomato);color:#FFF6EC;border-radius:14px 4px 14px 14px}
+.bubble.recipe{width:250px;padding:0;overflow:hidden}
+.rp-head{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:var(--yolk-tint);border-bottom:1.5px solid var(--ink)}
+.rp-head b{font-size:15px}
+.rp-kcal{font-size:11px;color:var(--ink-soft)}
+.rp-label{font-size:10.5px;letter-spacing:.2em;color:var(--ink-soft);padding:10px 13px 5px;font-family:var(--mono)}
+.rp-ing{display:flex;flex-wrap:wrap;gap:6px;padding:0 13px}
+.rp-ing span{font-size:11.5px;border:1px solid var(--ink-soft);border-radius:99px;padding:2px 9px;background:var(--paper)}
+.rp-steps{margin:2px 13px 0;padding-left:0;counter-reset:st;list-style:none}
+.rp-steps li{position:relative;padding-left:26px;font-size:12.5px;line-height:1.65;margin-bottom:6px;counter-increment:st}
+.rp-steps li::before{content:counter(st);position:absolute;left:0;top:2px;width:17px;height:17px;border-radius:50%;background:var(--tomato);color:#FFF6EC;font-family:var(--mono);font-size:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ink)}
+.rp-acts{display:flex;gap:8px;padding:6px 13px 4px}
+.rp-acts .btn{flex:1;padding:7px 4px;font-size:12px}
+.rp-note{padding:4px 13px 12px;font-size:10px;color:var(--ink-soft)}
+.typing{display:inline-flex;gap:4px;padding:14px 16px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.chat-foot{flex:none;padding:8px 0 80px;background:var(--paper)}
+.qchips{display:flex;gap:7px;margin-bottom:9px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.qchips::-webkit-scrollbar{display:none}
+.qchip{flex:none;font-size:11.5px;border:1.5px dashed var(--ink-soft);border-radius:999px;padding:5px 11px;color:var(--ink-soft);background:var(--paper)}
+.chat-inp{display:flex;gap:9px;align-items:center;background:var(--paper-2);border:2px solid var(--ink);border-radius:999px;padding:5px 5px 5px 16px;box-shadow:2.5px 2.5px 0 var(--ink)}
+.chat-inp input{flex:1;border:none;background:transparent;font-size:13.5px}
+.send{width:38px;height:38px;border-radius:50%;background:var(--tomato);color:#FFF6EC;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* ============ ⑥ 日历 ============ */
+.mon-nav{display:flex;gap:7px}
+.cal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px}
+.cal-stats>div{background:var(--paper-2);border:1.5px solid var(--ink);border-radius:12px;padding:10px 6px;text-align:center;box-shadow:2px 2px 0 rgba(43,37,32,.85)}
+.cal-stats b{font-family:var(--mono);font-size:19px;font-weight:500;display:block}
+.cal-stats span{font-size:10.5px;color:var(--ink-soft)}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-week span{text-align:center;font-size:11px;color:var(--ink-soft)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;row-gap:7px}
+.cal-day{position:relative;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--mono);color:var(--ink)}
+.cal-day.pad{visibility:hidden}
+.cal-day.has::after{content:"";position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--tomato)}
+.cal-day.today{background:var(--tomato);color:#FFF6EC;font-weight:500;border-radius:50%}
+.cal-day.today::after{background:#FFF6EC}
+.cal-day.sel{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.cal-detail{margin-top:22px}
+.cd-title{font-family:var(--disp);font-weight:400;font-size:19px}
+.cd-sub{font-size:11.5px;color:var(--ink-soft);margin:3px 0 13px}
+.cd-empty{border:1.8px dashed var(--ink-soft);border-radius:13px;padding:26px 16px;text-align:center;color:var(--ink-soft);font-size:13px}
+.cd-empty i{display:block;font-size:20px;margin-bottom:9px;color:var(--hair)}
+
+/* ============ 轻提示 ============ */
+.toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);z-index:20;background:var(--cocoa);color:#F5EBDC;font-size:12.5px;border-radius:999px;padding:9px 18px;opacity:0;pointer-events:none;transition:all .25s;border:1.5px solid rgba(245,235,220,.25);white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ 画布页脚 ============ */
+.cv-foot{max-width:1520px;margin:0 auto;padding:0 40px 80px;color:#C9B9A2;font-size:13px;line-height:1.8;border-top:1px solid rgba(245,235,220,.14)}
+.cv-foot .in{padding-top:28px;display:flex;flex-wrap:wrap;gap:14px 60px;align-items:flex-start}
+.cv-foot b{color:#F5EBDC;font-weight:500}
+.cv-foot .file{font-family:var(--mono);font-size:12px;color:#F4B63F}
+
+@media (max-width:1160px){.shot-row{flex-direction:column}.notes{width:390px;max-width:100%}}
+@media (max-width:460px){.stage{padding:32px 10px}.phone{width:100%;max-width:410px;padding:8px;border-radius:44px}.p-view{width:100%;height:760px;border-radius:38px}.notes{width:100%}.cv-head{padding:40px 18px 0}.cv-head h1{font-size:34px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="cv-head">
+  <p class="cv-kicker mono">PROTOTYPE · V0.1 · 2026-08-29 · 可点击交互</p>
+  <h1>「食光记」原型图 <em>·</em> 每日食物记录网页</h1>
+  <p class="cv-sub">六屏高保真原型，<b>每台"手机"都是完整可交互的 App</b>：可以注册登录、跳转 Tab、抽一餐、发消息、选日历日期。配套需求文档见 <b>docs/用户需求文档.md</b>。移动端优先，桌面端为响应式布局。</p>
+  <div class="tokens">
+    <span class="tk"><i class="sw" style="background:#FFF8EE"></i>纸面米白 #FFF8EE</span>
+    <span class="tk"><i class="sw" style="background:#2B2520"></i>墨炭 #2B2520</span>
+    <span class="tk"><i class="sw" style="background:#E8502F"></i>番茄红 #E8502F</span>
+    <span class="tk"><i class="sw" style="background:#3E8E4E"></i>蔬菜绿 #3E8E4E</span>
+    <span class="tk"><i class="sw" style="background:#F4B63F"></i>蛋黄 #F4B63F</span>
+    <span class="tk"><i class="sw" style="background:#31261B"></i>可可深棕 #31261B</span>
+    <span class="tk type"><b>食光记</b> ZCOOL KuaiLe / Noto Sans SC / DM Mono</span>
+    <span class="tk type">签名元素：饮食小票 · 印章打卡 · 营养标签票据</span>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- ① 登录/注册 -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">01/</span><b>登录 · 注册</b><span>未登录唯一入口</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="auth-login"></div>
+      <aside class="notes">
+        <p class="n"><b>登录/注册</b>同页切换，注册成功自动登录进主页。</p>
+        <p class="n">密码 ≥ 8 位含字母数字；错误<b>就地提示</b>不弹窗。</p>
+        <p class="n">会话保持 7–30 天，刷新不掉线。</p>
+        <p class="n">P1：忘记密码；P2：微信登录。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ② 今日主页 -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">02/</span><b>今日主页</b><span>记录与汇总的核心</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="home"></div>
+      <aside class="notes">
+        <p class="n"><b>营养标签票据卡</b>：摄入 / 目标 / 剩余额度环形图 + 三大营养素。</p>
+        <p class="n">按<b>餐次分组</b>的小票行卡，悬停出现编辑/删除。</p>
+        <p class="n">晚餐为<b>空态</b>，一键跳"来一餐"。</p>
+        <p class="n">底部 Tab 中轴 FAB = 记一餐（打破栅格）。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ③ 记一餐 -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">03/</span><b>记一餐 · 手动录入</b><span>目标 10 秒完成</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="entry"></div>
+      <aside class="notes">
+        <p class="n">仅食物名<b>必填</b>；热量可留空，用「AI 估算」回填。</p>
+        <p class="n"><b>常吃食物 chips</b> 一键回填名称与分量。</p>
+        <p class="n">餐次按当前时段预选；日期可补记过去 7 天。</p>
+        <p class="n">保存后<b>乐观更新</b>主页并轻提示"已记到午餐"。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ④ 来一餐 -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">04/</span><b>来一餐 · 随机推荐</b><span>一键解决"吃什么"</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="random"></div>
+      <aside class="notes">
+        <p class="n"><b>点击骰子试试</b>——抽卡翻面动画；「换一个」继续抽。</p>
+        <p class="n">结果卡：名称 / 热量 / 时长 / 标签。</p>
+        <p class="n">「记录这一餐」按当前时段写入今日记录。</p>
+        <p class="n">筛选 chips 影响抽取池；菜库为内置 100 道家常菜。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ⑤ 问 AI -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">05/</span><b>问 AI · 食谱问答</b><span>食材 → 食谱 → 记录</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="ai"></div>
+      <aside class="notes">
+        <p class="n"><b>点下方快捷提问试试</b>——消息发出 → 流式"正在输入" → 回复。</p>
+        <p class="n">回复为<b>结构化食谱卡</b>：食材、步骤、估算热量。</p>
+        <p class="n">卡上可「记录这餐」一键落库，或收藏。</p>
+        <p class="n">超时 20s 兜底文案 + 重试；热量声明"仅供参考"。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ⑥ 日历 -->
+  <section class="shot">
+    <div class="shot-tag"><span class="no">06/</span><b>日历 · 历史记录</b><span>印章打卡墙</span></div>
+    <div class="shot-row">
+      <div class="phone" data-start="calendar"></div>
+      <aside class="notes">
+        <p class="n"><b>点击任意日期试试</b>——下方切换当日汇总/空态。</p>
+        <p class="n">有记录的日期盖<b>打卡圆点</b>（印章），今天红色高亮。</p>
+        <p class="n">月度统计：记录天数 / 连续打卡 / 日均热量。</p>
+        <p class="n">明细只读；补记入口在「+」。</p>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<footer class="cv-foot">
+  <div class="in">
+    <p><b>阅读指引</b><br>每台手机可自由跳转体验全流程；页面数据为原型演示数据。</p>
+    <p><b>配套文档</b><br><span class="file">docs/用户需求文档.md</span>　功能 / 数据模型 / 技术方案 / 里程碑</p>
+    <p><b>下一步</b><br>评审原型与开放问题（见文档第 11 节）→ 确认后进入 CloudBase 资源准备与开发。</p>
+  </div>
+</footer>
+
+<!-- ============ App 模板（克隆进每台手机） ============ -->
+<template id="tpl-app">
+  <div class="p-view">
+  <div class="statusbar"><span class="sb-time">12:30</span><span class="sb-ico"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-three-quarters"></i></span></div>
+
+  <!-- ① 登录 -->
+  <div class="scr bare" data-scr="auth-login">
+    <div class="auth-wrap">
+      <div class="brand">
+        <div class="brand-mark"><i class="fa-solid fa-utensils"></i></div>
+        <h1 class="brand-name">食光记</h1>
+        <p class="brand-slogan">好好吃饭 · 天天记得</p>
+      </div>
+      <div class="seg">
+        <button class="seg-btn on">登 录</button>
+        <button class="seg-btn" data-goto="auth-register">注 册</button>
+      </div>
+      <div class="field"><label>用户名或邮箱</label>
+        <div class="inp"><i class="fa-regular fa-user"></i><input placeholder="you@example.com"></div>
+      </div>
+      <div class="field"><label>密码</label>
+        <div class="inp"><i class="fa-solid fa-lock"></i><input type="password" placeholder="至少 8 位，含字母和数字"></div>
+      </div>
+      <button class="btn primary block" data-toast="登录成功，进入今日主页（原型演示）">登 录</button>
+      <p class="fine">忘记密码？<a href="javascript:void(0)" data-toast="忘记密码为 P1 功能（见需求文档）">找回密码</a></p>
+      <p class="fine">登录即代表同意 <a href="javascript:void(0)">《用户协议》</a> 与 <a href="javascript:void(0)">《隐私政策》</a></p>
+    </div>
+  </div>
+
+  <!-- ② 注册 -->
+  <div class="scr bare" data-scr="auth-register">
+    <div class="auth-wrap">
+      <div class="brand">
+        <div class="brand-mark"><i class="fa-solid fa-utensils"></i></div>
+        <h1 class="brand-name">食光记</h1>
+        <p class="brand-slogan">好好吃饭 · 天天记得</p>
+      </div>
+      <div class="seg">
+        <button class="seg-btn" data-goto="auth-login">登 录</button>
+        <button class="seg-btn on">注 册</button>
+      </div>
+      <div class="reg-hint"><i class="fa-solid fa-circle-info"></i><span>注册成功将自动登录，并带你完成第一餐记录。</span></div>
+      <div class="field"><label>用户名</label>
+        <div class="inp"><i class="fa-regular fa-user"></i><input placeholder="2–20 个字符，注册后可改"></div>
+      </div>
+      <div class="field"><label>邮箱</label>
+        <div class="inp"><i class="fa-regular fa-envelope"></i><input placeholder="用于登录与找回密码"></div>
+      </div>
+      <div class="field"><label>密码</label>
+        <div class="inp"><i class="fa-solid fa-lock"></i><input type="password" placeholder="至少 8 位，含字母和数字"></div>
+      </div>
+      <div class="field"><label>确认密码</label>
+        <div class="inp"><i class="fa-solid fa-lock"></i><input type="password" placeholder="再输入一次"></div>
+      </div>
+      <button class="btn primary block" data-toast="注册成功，自动登录（原型演示）">创建账号</button>
+      <p class="fine">注册即代表同意 <a href="javascript:void(0)">《用户协议》</a> 与 <a href="javascript:void(0)">《隐私政策》</a></p>
+    </div>
+  </div>
+
+  <!-- ③ 今日主页 -->
+  <div class="scr" data-scr="home">
+    <header class="app-head">
+      <div>
+        <p class="eyebrow">2026-08-29 · 周六</p>
+        <h2 class="greet">中午好，阿禾</h2>
+      </div>
+      <span class="streak"><i class="fa-solid fa-fire"></i>连续 6 天</span>
+    </header>
+
+    <section class="ticket">
+      <div class="tk-top mono"><span>今日摄入 · TODAY</span><span>目标 1,800 KCAL</span></div>
+      <div class="tk-main">
+        <div class="tk-num"><b>987</b><span>kcal</span></div>
+        <div class="donut"><div class="donut-in"><b>55%</b><span>剩 813</span></div></div>
+      </div>
+      <div class="tk-bars">
+        <div class="bar-row"><span>蛋白质</span><div class="bar"><i style="width:48%"></i></div><b>58g</b></div>
+        <div class="bar-row"><span>碳水</span><div class="bar"><i style="width:45%"></i></div><b>112g</b></div>
+        <div class="bar-row"><span>脂肪</span><div class="bar"><i style="width:52%"></i></div><b>31g</b></div>
+      </div>
+    </section>
+
+    <div class="quick">
+      <button class="qk t1" data-goto="entry"><i class="fa-solid fa-pen-to-square"></i>记一餐</button>
+      <button class="qk t2" data-goto="random"><i class="fa-solid fa-dice"></i>来一餐</button>
+      <button class="qk t3" data-goto="ai"><i class="fa-solid fa-robot"></i>问 AI</button>
+    </div>
+
+    <section class="meal">
+      <div class="meal-head"><h3><span class="dot m-bf"></span>早餐</h3><span class="sum">325 kcal · 3 条</span></div>
+      <div class="rc"><span class="rc-mono m-bf">蛋</span><div class="rc-body"><b>水煮蛋</b><span class="rc-meta">2 个 · 07:50</span></div><div class="rc-right"><b>156<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+      <div class="rc"><span class="rc-mono m-bf">豆</span><div class="rc-body"><b>无糖豆浆</b><span class="rc-meta">300ml · 07:52</span></div><div class="rc-right"><b>80<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+      <div class="rc"><span class="rc-mono m-bf">面</span><div class="rc-body"><b>全麦面包</b><span class="rc-meta">1 片 · 07:55</span></div><div class="rc-right"><b>89<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+    </section>
+
+    <section class="meal">
+      <div class="meal-head"><h3><span class="dot m-lu"></span>午餐</h3><span class="sum">657 kcal · 2 条</span></div>
+      <div class="rc"><span class="rc-mono m-lu">番</span><div class="rc-body"><b>番茄牛腩盖饭</b><span class="rc-meta">1 份 · 12:10</span></div><div class="rc-right"><b>612<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+      <div class="rc"><span class="rc-mono m-lu">瓜</span><div class="rc-body"><b>凉拌黄瓜</b><span class="rc-meta">1 小份 · 12:12</span></div><div class="rc-right"><b>45<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+    </section>
+
+    <section class="meal">
+      <div class="meal-head"><h3><span class="dot m-di"></span>晚餐</h3><span class="sum">0 kcal</span></div>
+      <div class="rc-empty">
+        <p>还没安排今晚吃什么</p>
+        <button class="btn ghost sm" data-goto="random"><i class="fa-solid fa-dice"></i>去来一餐抽一个</button>
+      </div>
+    </section>
+
+    <section class="meal">
+      <div class="meal-head"><h3><span class="dot m-sn"></span>加餐</h3><span class="sum">5 kcal · 1 条</span></div>
+      <div class="rc"><span class="rc-mono m-sn">咖</span><div class="rc-body"><b>美式咖啡</b><span class="rc-meta">1 杯 · 10:30</span></div><div class="rc-right"><b>5<i>kcal</i></b><span class="rc-act"><i class="fa-regular fa-pen-to-square"></i><i class="fa-regular fa-trash-can"></i></span></div></div>
+    </section>
+  </div>
+
+  <!-- ④ 记一餐 -->
+  <div class="scr bare" data-scr="entry">
+    <div class="sheet-head">
+      <button class="icon-btn" data-goto="home"><i class="fa-solid fa-chevron-left"></i></button>
+      <h3>记一餐</h3>
+      <span class="date-chip">2026-08-29</span>
+    </div>
+    <div class="field"><label>吃了什么 <small>必填</small></label>
+      <div class="inp"><i class="fa-solid fa-bowl-food"></i><input class="f-name" placeholder="如：番茄牛腩盖饭"></div>
+    </div>
+    <div class="quick-chips">
+      <button class="qc" data-fill="水煮蛋">水煮蛋</button>
+      <button class="qc" data-fill="无糖豆浆">无糖豆浆</button>
+      <button class="qc" data-fill="燕麦碗">燕麦碗</button>
+      <button class="qc" data-fill="美式咖啡">美式咖啡</button>
+      <button class="qc" data-fill="全麦面包">全麦面包</button>
+      <button class="qc" data-fill="鸡胸肉">鸡胸肉</button>
+    </div>
+    <div class="field"><label>餐次</label>
+      <div class="seg4"><button>早餐</button><button class="on">午餐</button><button>晚餐</button><button>加餐</button></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>份数</label>
+        <div class="stepper"><button data-toast="原型演示：步进 −0.5"><i class="fa-solid fa-minus"></i></button><b>1.0</b><button data-toast="原型演示：步进 +0.5"><i class="fa-solid fa-plus"></i></button></div>
+      </div>
+      <div class="field"><label>单位</label>
+        <div class="inp sel"><select><option>份</option><option>碗</option><option>个</option><option>杯</option><option>克</option></select></div>
+      </div>
+    </div>
+    <div class="field"><label>热量 <small>可留空，交给 AI 估算</small></label>
+      <div class="row-kcal">
+        <div class="inp"><input inputmode="numeric" placeholder="kcal"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        <button class="btn ghost sm" data-toast="AI 估算完成：约 480 kcal，可修改（原型演示）"><i class="fa-solid fa-wand-magic-sparkles"></i>AI 估算</button>
+      </div>
+    </div>
+    <div class="field"><label>备注 <small>可选</small></label>
+      <div class="inp"><i class="fa-regular fa-note-sticky"></i><input placeholder="少油、外卖、和同事拼单…"></div>
+    </div>
+    <button class="btn primary block" data-save><i class="fa-solid fa-check"></i>保存到今日午餐</button>
+  </div>
+
+  <!-- ⑤ 来一餐 -->
+  <div class="scr" data-scr="random">
+    <header class="app-head">
+      <div>
+        <p class="eyebrow">来一餐 · 随机推荐</p>
+        <h2 class="greet">今天吃什么？</h2>
+      </div>
+    </header>
+    <div class="fchips">
+      <button class="fchip on">不限</button>
+      <button class="fchip">低卡</button>
+      <button class="fchip">高蛋白</button>
+      <button class="fchip">素食</button>
+      <button class="fchip">10分钟快手</button>
+    </div>
+    <div class="draw">
+      <div class="draw-idle">
+        <button class="draw-btn" data-draw aria-label="随机抽一餐"><i class="fa-solid fa-dice"></i></button>
+        <p>点一下，<b>随机抽一餐</b></p>
+      </div>
+      <div class="draw-card" hidden>
+        <div class="dc-cover c-tomato"><span class="dc-mono">番</span></div>
+        <div class="dc-body">
+          <b class="dc-name">番茄鸡蛋盖饭</b>
+          <p class="dc-meta mono">512 kcal · 10 min</p>
+          <div class="dc-tags"><span>快手</span><span>家常</span></div>
+          <div class="dc-acts">
+            <button class="btn ghost" data-draw><i class="fa-solid fa-arrow-rotate-right"></i>换一个</button>
+            <button class="btn primary" data-save><i class="fa-solid fa-check"></i>记录这一餐</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="foot-note mono">菜库：内置 100 道家常菜 · 筛选与饮食偏好将影响抽取池</p>
+  </div>
+
+  <!-- ⑥ 问 AI -->
+  <div class="scr col" data-scr="ai">
+    <header class="app-head ai-head">
+      <span class="ai-ava"><i class="fa-solid fa-robot"></i></span>
+      <div style="flex:1">
+        <h2 class="greet sm">食光 AI</h2>
+        <p class="eyebrow">问食材 · 问做法 · 问搭配</p>
+      </div>
+    </header>
+    <div class="chat">
+      <div class="msg ai"><span class="msg-ava"><i class="fa-solid fa-robot"></i></span><div class="bubble">你好呀！告诉我你<b>冰箱里有什么</b>、想花多少时间，我来帮你搭配一餐。</div></div>
+      <div class="msg me"><div class="bubble">冰箱有鸡蛋、番茄和米饭，10 分钟能做什么？</div></div>
+      <div class="msg ai">
+        <span class="msg-ava"><i class="fa-solid fa-robot"></i></span>
+        <div class="bubble recipe">
+          <div class="rp-head"><b>番茄鸡蛋盖饭</b><span class="rp-kcal mono">约 512 kcal</span></div>
+          <p class="rp-label">食材</p>
+          <div class="rp-ing"><span>鸡蛋 2 个</span><span>番茄 1 个</span><span>米饭 1 碗</span><span>葱花 少许</span></div>
+          <p class="rp-label">步骤</p>
+          <ol class="rp-steps">
+            <li>番茄切块，鸡蛋打散加少许盐。</li>
+            <li>热锅快炒鸡蛋，凝固后盛出。</li>
+            <li>番茄炒出汁，回锅鸡蛋翻匀，浇在热米饭上。</li>
+          </ol>
+          <div class="rp-acts">
+            <button class="btn primary" data-save><i class="fa-solid fa-check"></i>记录这餐</button>
+            <button class="btn ghost" data-toast="已收藏食谱（原型演示）"><i class="fa-regular fa-bookmark"></i>收藏</button>
+          </div>
+          <p class="rp-note mono">热量为 AI 估算，仅供参考</p>
+        </div>
+      </div>
+    </div>
+    <div class="chat-foot">
+      <div class="qchips">
+        <button class="qchip">低卡晚餐怎么搭配</button>
+        <button class="qchip">高蛋白早餐推荐</button>
+        <button class="qchip">冰箱剩菜一锅出</button>
+      </div>
+      <div class="chat-inp">
+        <input placeholder="问我吃什么…">
+        <button class="send" data-toast="已发送，AI 正在生成（原型演示）"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 日历 -->
+  <div class="scr" data-scr="calendar">
+    <header class="app-head">
+      <div>
+        <p class="eyebrow">日历 · 历史记录</p>
+        <h2 class="greet sm">2026年8月</h2>
+      </div>
+      <div class="mon-nav">
+        <button class="icon-btn" data-toast="原型演示：切换到 7 月"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="icon-btn" data-toast="原型演示：切换到 9 月"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </header>
+    <div class="cal-stats">
+      <div><b>19</b><span>记录天数</span></div>
+      <div><b>6</b><span>连续打卡</span></div>
+      <div><b>1,432</b><span>日均 kcal</span></div>
+    </div>
+    <div class="cal">
+      <div class="cal-week mono"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+      <div class="cal-grid"></div>
+    </div>
+    <div class="cal-detail">
+      <h3 class="cd-title">8月29日 · 周六</h3>
+      <p class="cd-sub mono">摄入 987 kcal · 6 条记录</p>
+      <div class="cd-list">
+        <div class="rc"><span class="rc-mono m-bf">蛋</span><div class="rc-body"><b>水煮蛋</b><span class="rc-meta">2 个 · 07:50</span></div><div class="rc-right"><b>156<i>kcal</i></b></div></div>
+        <div class="rc"><span class="rc-mono m-bf">豆</span><div class="rc-body"><b>无糖豆浆</b><span class="rc-meta">300ml · 07:52</span></div><div class="rc-right"><b>80<i>kcal</i></b></div></div>
+        <div class="rc"><span class="rc-mono m-lu">番</span><div class="rc-body"><b>番茄牛腩盖饭</b><span class="rc-meta">1 份 · 12:10</span></div><div class="rc-right"><b>612<i>kcal</i></b></div></div>
+        <div class="rc"><span class="rc-mono m-sn">咖</span><div class="rc-body"><b>美式咖啡</b><span class="rc-meta">1 杯 · 10:30</span></div><div class="rc-right"><b>5<i>kcal</i></b></div></div>
+      </div>
+      <div class="cd-empty" hidden><i class="fa-regular fa-folder-open"></i>这一天没有留下记录<br><span class="mono" style="font-size:10px">补记入口：今日主页「+」</span></div>
+    </div>
+  </div>
+
+  <!-- Tab 栏 + FAB -->
+  <nav class="tabbar">
+    <button class="tab on" data-goto="home"><i class="fa-solid fa-house"></i><span>今日</span></button>
+    <button class="tab" data-goto="random"><i class="fa-solid fa-dice"></i><span>来一餐</span></button>
+    <span class="tab-gap"></span>
+    <button class="tab" data-goto="ai"><i class="fa-solid fa-robot"></i><span>问 AI</span></button>
+    <button class="tab" data-goto="calendar"><i class="fa-solid fa-calendar-days"></i><span>日历</span></button>
+  </nav>
+  <div class="fab" data-goto="entry" role="button" aria-label="记一餐"><i class="fa-solid fa-plus"></i></div>
+  <div class="toast"></div>
+  </div>
+</template>
+
+<script>
+/* ---------- 数据 ---------- */
+const DISHES = [
+  {n:'番茄鸡蛋盖饭', k:512, m:10, t:['快手','家常'], c:'c-tomato'},
+  {n:'香煎鸡胸藜麦碗', k:436, m:15, t:['高蛋白','低卡'], c:'c-veg'},
+  {n:'牛油果鸡蛋三明治', k:398, m:8, t:['快手','高蛋白'], c:'c-yolk'},
+  {n:'酸汤肥牛面', k:645, m:20, t:['暖胃','家常'], c:'c-cocoa'},
+  {n:'凉拌鸡丝荞麦面', k:385, m:12, t:['低卡','清爽'], c:'c-veg'},
+  {n:'虾仁滑蛋盖饭', k:470, m:12, t:['高蛋白','快手'], c:'c-tomato'},
+  {n:'菌菇豆腐味噌汤餐', k:312, m:10, t:['素食','低卡'], c:'c-yolk'}
+];
+const WEEK = ['周一','周二','周三','周四','周五','周六','周日'];
+const HAS_RECORD = new Set([3,4,5,6,7,10,11,12,13,14,17,18,19,20,21,24,25,26,27,28,29]);
+const TODAY = 29; // 2026-08-29 周六
+
+/* ---------- 模板克隆：每台手机都是完整 App ---------- */
+const tpl = document.getElementById('tpl-app');
+document.querySelectorAll('.phone[data-start]').forEach(phone => {
+  phone.appendChild(tpl.content.cloneNode(true));
+  const start = phone.dataset.start;
+  switchScreen(phone, start);
+  renderCalendar(phone, TODAY);
+});
+
+function switchScreen(phone, id){
+  const scr = phone.querySelector('.scr[data-scr="'+id+'"]');
+  if(!scr) return;
+  phone.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s === scr));
+  phone.classList.toggle('no-tab', scr.classList.contains('bare'));
+  phone.querySelectorAll('.tabbar .tab').forEach(t => t.classList.toggle('on', t.dataset.goto === id));
+  scr.scrollTop = 0;
+}
+
+/* ---------- 日历（2026-08，周一起始） ---------- */
+function renderCalendar(phone, selected){
+  const grid = phone.querySelector('.cal-grid');
+  grid.innerHTML = '';
+  for(let i=0;i<5;i++){ // 2026-08-01 是周六，周一起始补 5 格
+    const p = document.createElement('span'); p.className='cal-day pad'; grid.appendChild(p);
+  }
+  for(let d=1; d<=31; d++){
+    const b = document.createElement('button');
+    b.className = 'cal-day';
+    if(HAS_RECORD.has(d)) b.classList.add('has');
+    if(d === TODAY) b.classList.add('today');
+    if(d === selected) b.classList.add('sel');
+    b.textContent = d;
+    b.dataset.day = d;
+    grid.appendChild(b);
+  }
+}
+function updateDayDetail(phone, d){
+  const idx = (d + 4) % 7; // 2026-08-01 周六 → idx=5（周一=0）
+  phone.querySelector('.cd-title').textContent = '8月' + d + '日 · ' + WEEK[idx];
+  const has = HAS_RECORD.has(d);
+  phone.querySelector('.cd-sub').hidden = !has;
+  phone.querySelector('.cd-list').hidden = !has;
+  phone.querySelector('.cd-empty').hidden = has;
+}
+
+/* ---------- 轻提示 ---------- */
+let toastTimer = null;
+function showToast(phone, text){
+  const t = phone.querySelector('.toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ---------- 随机抽卡 ---------- */
+function drawDish(phone){
+  const card = phone.querySelector('.draw-card');
+  const idle = phone.querySelector('.draw-idle');
+  const dish = DISHES[Math.floor(Math.random() * DISHES.length)];
+  card.querySelector('.dc-cover').className = 'dc-cover ' + dish.c;
+  card.querySelector('.dc-mono').textContent = dish.n[0];
+  card.querySelector('.dc-name').textContent = dish.n;
+  card.querySelector('.dc-meta').textContent = dish.k + ' kcal · ' + dish.m + ' min';
+  const tags = card.querySelector('.dc-tags');
+  tags.innerHTML = '';
+  dish.t.forEach(tag => { const s = document.createElement('span'); s.textContent = tag; tags.appendChild(s); });
+  idle.hidden = true;
+  card.hidden = false;
+  card.style.animation = 'none';
+  void card.offsetWidth; // 重新触发翻卡动画
+  card.style.animation = '';
+}
+
+/* ---------- AI 快捷提问（原型 canned 回复） ---------- */
+function askAI(phone, text){
+  const chat = phone.querySelector('.chat');
+  const me = document.createElement('div');
+  me.className = 'msg me';
+  const bub = document.createElement('div'); bub.className = 'bubble'; bub.textContent = text;
+  me.appendChild(bub); chat.appendChild(me);
+  const ai = document.createElement('div');
+  ai.className = 'msg ai';
+  ai.innerHTML = '<span class="msg-ava"><i class="fa-solid fa-robot"></i></span>';
+  const typing = document.createElement('div');
+  typing.className = 'bubble typing';
+  typing.innerHTML = '<i></i><i></i><i></i>';
+  ai.appendChild(typing); chat.appendChild(ai);
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    typing.className = 'bubble';
+    typing.textContent = '收到！基于你的食材，推荐试试「杂蔬鸡蛋炒饭」：隔夜饭 1 碗、鸡蛋 2 个、冰箱边角料切丁，热锅快炒 5 分钟，约 480 kcal。（原型演示回复，正式版为流式输出）';
+    chat.scrollTop = chat.scrollHeight;
+  }, 1100);
+}
+
+/* ---------- 事件委托 ---------- */
+document.addEventListener('click', e => {
+  const phone = e.target.closest('.phone');
+  const goto = e.target.closest('[data-goto]');
+  if(goto && phone){ switchScreen(phone, goto.dataset.goto); return; }
+
+  if(!phone) return;
+
+  const toast = e.target.closest('[data-toast]');
+  if(toast){ showToast(phone, toast.dataset.toast); return; }
+
+  const save = e.target.closest('[data-save]');
+  if(save){
+    showToast(phone, '已保存 · 已写入今日记录（原型演示）');
+    if(phone.querySelector('.scr.on')?.dataset.scr === 'entry'){
+      setTimeout(() => switchScreen(phone, 'home'), 650);
+    }
+    return;
+  }
+
+  const draw = e.target.closest('[data-draw]');
+  if(draw){ drawDish(phone); return; }
+
+  const fill = e.target.closest('[data-fill]');
+  if(fill){
+    const name = phone.querySelector('.f-name');
+    if(name) name.value = fill.dataset.fill;
+    showToast(phone, '已回填「' + fill.dataset.fill + '」，热量可 AI 估算');
+    return;
+  }
+
+  const seg4 = e.target.closest('.seg4 button');
+  if(seg4){
+    seg4.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+    seg4.classList.add('on');
+    return;
+  }
+
+  const fchip = e.target.closest('.fchip');
+  if(fchip){
+    fchip.parentElement.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+    fchip.classList.add('on');
+    showToast(phone, '筛选「' + fchip.textContent.trim() + '」已生效（原型演示）');
+    return;
+  }
+
+  const qchip = e.target.closest('.qchip');
+  if(qchip){ askAI(phone, qchip.textContent.trim()); return; }
+
+  const day = e.target.closest('.cal-day[data-day]');
+  if(day){
+    phone.querySelectorAll('.cal-day.sel').forEach(x => x.classList.remove('sel'));
+    day.classList.add('sel');
+    updateDayDetail(phone, +day.dataset.day);
+  }
+});
+</script>
+</body>
+</html>

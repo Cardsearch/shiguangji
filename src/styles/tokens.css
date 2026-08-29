@@ -1,0 +1,19 @@
+:root {
+  --paper: #fff8ee; /* 纸面米白 */
+  --paper-2: #fffdf7; /* 卡片白 */
+  --ink: #2b2520; /* 墨炭 */
+  --ink-soft: #7a6c5c; /* 弱化文字 */
+  --hair: #eadcc6; /* 细线 */
+  --tomato: #e8502f; /* 番茄红 */
+  --tomato-deep: #c93a1d;
+  --tomato-tint: #fad9ce;
+  --veg: #3e8e4e; /* 蔬菜绿 */
+  --veg-tint: #dcead5;
+  --yolk: #f4b63f; /* 蛋黄 */
+  --yolk-tint: #fbebc4;
+  --cocoa: #31261b; /* 可可深棕 */
+  --cocoa-tint: #e9dfd3;
+  --disp: 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
+  --body: 'Noto Sans SC', sans-serif;
+  --mono: 'DM Mono', 'Noto Sans SC', monospace;
+}
